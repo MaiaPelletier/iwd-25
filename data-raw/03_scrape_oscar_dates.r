@@ -1,6 +1,5 @@
 library(rvest)
 library(dplyr)
-library(purrr)
 library(here)
 library(stringr)
 
