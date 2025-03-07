@@ -44,7 +44,8 @@ clean_winner_tbl <- function(df) {
       Performer = str_trim(Performer),
       Oscars_No = str_extract(Year, "\\(.*\\)"),
       Oscars_No = str_extract(Oscars_No, "[0-9]+"),
-      Year = str_extract(Year, "[0-9]{4}")
+      Year = str_extract(Year, "[0-9]{4}"),
+      Year = as.numeric(Year)
     ) |>
     distinct()
 }
@@ -68,7 +69,8 @@ get_winners <- function(html) {
   winner_tbl <-
     get_winners_from_tbls(all_tbls) |>
     clean_winner_tbl() |>
-    left_join(wiki_links, by = c("Performer" = "title"))
+    left_join(wiki_links, by = c("Performer" = "title")) |>
+    janitor::clean_names()
 
   return(winner_tbl)
 }
@@ -79,6 +81,6 @@ wikis <- c(
 )
 
 htmls <- map(wikis, read_html)
-winners <- map_dfr(htmls, get_winners) |> arrange(Year)
+winners <- map_dfr(htmls, get_winners) |> arrange(year)
 
 readr::write_rds(winners, here("data", "winners.rds"))
