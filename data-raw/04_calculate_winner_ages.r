@@ -1,24 +1,23 @@
-library(rvest)
 library(dplyr)
-library(purrr)
 library(here)
+library(lubridate)
 
 winners <- readr::read_rds(here("data", "winners.rds"))
 bdays <- readr::read_rds(here("data", "bdays.rds"))
+oscars <- readr::read_rds(here("data", "oscars.rds"))
 
-# TODO: Get dates of each Academy Award ceremony to properly calculate ages
 winners_ages <- 
     winners |>
     left_join(bdays) |>
+    left_join(oscars) |>
     mutate(
-        birth_year = lubridate::year(birth_day),
-        age = year - birth_year
+        age = year(as.period(interval(birth_day, oscars_date)))
     ) |>
     select(
         oscars_no, 
-        oscars_year = year,
-        winner = performer,
+        oscars_date,
         category,
+        winner = performer,
         birth_day,
         age
     )
